@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مقارنة استبيان تنمية الموارد المالية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A28;
+    --paper:#F6F3EC;
+    --card:#FFFFFF;
+    --green-deep:#0E3B36;
+    --green-mid:#175C52;
+    --gold:#B98B2A;
+    --gold-soft:#F2E4C4;
+    --line:#E4DFD1;
+    --muted:#6E6A5D;
+    --diff:#B4472A;
+    --diff-bg:#FBEEE9;
+    --same-bg:#F2F7F1;
+    --same-dot:#3F7A55;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif;
+    direction:rtl;
+    line-height:1.6;
+  }
+
+  /* ---------- Header ---------- */
+  header.hero{
+    background:
+      radial-gradient(1100px 300px at 15% -30%, rgba(185,139,42,0.18), transparent 60%),
+      linear-gradient(160deg,var(--green-deep) 0%, #0A2B27 100%);
+    color:#F7F4EA;
+    padding:22px 32px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-inner{max-width:1180px;margin:0 auto;position:relative;}
+
+  .vs-row{
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+  .org-chip{
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:10px;
+    padding:14px 20px;
+    min-width:220px;
+  }
+  .org-chip .label{font-size:12px;color:var(--gold-soft);margin-bottom:4px;}
+  .org-chip .name{font-size:18px;font-weight:700;}
+  .vs-mark{
+    font-family:'Tajawal',sans-serif;
+    font-weight:800;
+    color:var(--gold);
+    font-size:20px;
+    padding:0 4px;
+  }
+
+  /* ---------- Controls (sticky) ---------- */
+  .controls{
+    position:sticky;top:0;z-index:20;
+    background:rgba(246,243,236,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:14px 32px;
+  }
+  .controls-inner{
+    max-width:1180px;margin:0 auto;
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  }
+  .search-box{
+    position:relative;flex:1 1 260px;max-width:360px;
+  }
+  .search-box input{
+    width:100%;
+    padding:10px 40px 10px 14px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:var(--card);
+    font-family:inherit;
+    font-size:14px;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s;
+  }
+  .search-box input:focus{border-color:var(--green-mid);}
+  .search-box svg{position:absolute;right:13px;top:50%;transform:translateY(-50%);opacity:.45;}
+
+  .filter-group{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip-btn{
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--muted);
+    font-family:inherit;
+    font-size:13.5px;
+    padding:8px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .chip-btn:hover{border-color:var(--green-mid);color:var(--green-deep);}
+  .chip-btn.active{
+    background:var(--green-deep);
+    border-color:var(--green-deep);
+    color:#fff;
+  }
+
+  .toggle-diff{
+    display:flex;align-items:center;gap:8px;
+    font-size:13.5px;color:var(--muted);
+    cursor:pointer;
+    user-select:none;
+  }
+  .switch{
+    width:38px;height:22px;border-radius:20px;
+    background:#D9D4C4;position:relative;
+    transition:background .2s;
+    flex-shrink:0;
+  }
+  .switch::after{
+    content:"";position:absolute;top:2px;right:2px;
+    width:18px;height:18px;border-radius:50%;
+    background:#fff;transition:transform .2s;
+    box-shadow:0 1px 2px rgba(0,0,0,.25);
+  }
+  .toggle-diff.on .switch{background:var(--diff);}
+  .toggle-diff.on .switch::after{transform:translateX(-16px);}
+
+  /* ---------- Nav pills (section jump) ---------- */
+  .section-nav{
+    max-width:1180px;margin:12px auto 0;
+    padding:0 32px 2px;
+    display:flex;gap:8px;overflow-x:auto;
+    scrollbar-width:thin;
+  }
+  .section-nav a{
+    flex-shrink:0;
+    font-size:13px;
+    color:var(--green-deep);
+    background:var(--gold-soft);
+    border:1px solid transparent;
+    padding:6px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:500;
+    transition:background .15s;
+  }
+  .section-nav a:hover{background:#E7D6A2;}
+
+  /* ---------- Main ---------- */
+  main{max-width:1180px;margin:0 auto;padding:34px 32px 80px;}
+
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:40px;
+  }
+  .stat-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px;
+  }
+  .stat-card .num{font-family:'Tajawal';font-weight:800;font-size:26px;color:var(--green-deep);}
+  .stat-card .lbl{font-size:12.5px;color:var(--muted);margin-top:4px;}
+
+  section.q-section{margin-bottom:44px;scroll-margin-top:150px;}
+  .section-head{
+    display:flex;align-items:baseline;gap:12px;
+    margin-bottom:18px;
+    padding-bottom:10px;
+    border-bottom:2px solid var(--green-deep);
+  }
+  .section-head h2{
+    font-family:'Tajawal';
+    font-size:20px;
+    font-weight:700;
+    color:var(--green-deep);
+    margin:0;
+  }
+  .section-head .count{
+    font-size:12.5px;color:var(--muted);
+    background:var(--paper);
+    padding:3px 10px;
+    border-radius:20px;
+    border:1px solid var(--line);
+  }
+
+  .q-row{
+    display:grid;
+    grid-template-columns:40px 1fr 1fr 1fr;
+    gap:0;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:10px;
+    overflow:hidden;
+    transition:box-shadow .15s;
+  }
+  .q-row:hover{box-shadow:0 3px 14px rgba(14,59,54,0.08);}
+  .q-row.is-diff{border-color:#E7C9BC;}
+  .q-row.hidden{display:none;}
+
+  .q-num{
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Tajawal';font-weight:700;
+    color:#fff;
+    background:var(--green-mid);
+    font-size:13px;
+  }
+  .q-row.is-diff .q-num{background:var(--diff);}
+
+  .q-text{
+    padding:14px 16px;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--ink);
+    border-inline-start:1px solid var(--line);
+    display:flex;
+    align-items:center;
+  }
+
+  .q-ans{
+    padding:14px 16px;
+    font-size:15.5px;
+    font-weight:500;
+    color:#151F1D;
+    line-height:1.85;
+    border-inline-start:1px solid var(--line);
+    white-space:pre-line;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:2px;
+  }
+  .q-ans .org-tag{
+    display:inline-block;
+    width:fit-content;
+    font-size:11px;
+    color:var(--green-deep);
+    background:var(--gold-soft);
+    font-weight:700;
+    letter-spacing:.01em;
+    padding:3px 10px;
+    border-radius:6px;
+    margin-bottom:8px;
+  }
+  .q-ans a{color:var(--green-mid);font-weight:600;}
+
+  /* donor / multi-name chip list */
+  .name-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    white-space:normal;
+  }
+  .name-list .name-chip{
+    background:var(--paper);
+    border:1px solid var(--line);
+    color:#151F1D;
+    font-size:13.5px;
+    font-weight:500;
+    padding:4px 10px;
+    border-radius:7px;
+    line-height:1.5;
+  }
+
+  .same-flag, .diff-flag{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11px;font-weight:600;
+    padding:2px 9px;border-radius:20px;
+    width:fit-content;
+    margin-top:8px;
+  }
+  .same-flag{background:var(--same-bg);color:var(--same-dot);}
+  .diff-flag{background:var(--diff-bg);color:var(--diff);}
+  .same-flag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--same-dot);}
+  .diff-flag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--diff);}
+  .flag-cell{
+    grid-column:2 / 3;
+    padding:0 16px 12px;
+    border-inline-start:1px solid var(--line);
+    margin-top:-8px;
+  }
+
+  @media (max-width: 820px){
+    .q-row{grid-template-columns:32px 1fr;}
+    .q-num{writing-mode:vertical-rl;padding:8px 0;}
+    .q-text{border-inline-start:none;border-bottom:1px solid var(--line);}
+    .q-ans{border-inline-start:none;border-bottom:1px solid var(--line);}
+    .flag-cell{grid-column:1/-1;border:none;margin-top:0;padding:0 16px 12px;}
+    header.hero{padding:18px 20px;}
+    main{padding:26px 20px 60px;}
+  }
+
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--muted);
+    display:none;
+  }
+  .empty-state.show{display:block;}
+
+  footer{
+    text-align:center;
+    padding:26px 20px 40px;
+    color:var(--muted);
+    font-size:12.5px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="vs-row">
+      <div class="org-chip">
+        <div class="label">الجمعية الأولى</div>
+        <div class="name">جمعية التنمية الأهلية</div>
+      </div>
+      <span class="vs-mark">مقابل</span>
+      <div class="org-chip">
+        <div class="label">الجمعية الثانية</div>
+        <div class="name">جمعية رؤية للطفولة</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="sectionsRoot"></div>
+</main>
+
+<footer>مصدر البيانات: نتائج استبيان خدمة تنمية الموارد المالية — لوحة تحكم زاد التنموية</footer>
+
+<script>
+const COL1 = "جمعية التنمية الأهلية";
+const COL2 = "جمعية رؤية للطفولة";
+
+const sections = [
+  { title: "المعلومات الأساسية", rows: [
+    [1,"اسم الجمعية","جمعية التنمية الأهلية","جمعية رؤية للطفولة"],
+    [2,"رقم ترخيص الجمعية","4173","5098"],
+    [3,"تاريخ إنشاء الجمعية","١٤٤٣/٠٩/١٣","١٤٤٤/٠٦/٢٢"],
+    [4,"موقع المقر الرئيسي للجمعية","مكة المكرمة - المعيصم","مكة المكرمة - المعيصم"],
+    [5,"رقم الجوال الرسمي للجمعية","0537775756","0500996362"],
+    [6,"العنوان الوطني المختصر للجمعية","5348 5348، MFJA، مكة 24239","MFJA3939"],
+    [7,"البريد الالكتروني الرسمي للجمعية","info@tanmiam.org.sa","info@vca.org.sa"],
+    [8,"هل الإيميل الذي تم إدخاله يعمل الآن؟","نعم","نعم"],
+    [9,"موقع الويب الخاص بالجمعية -إن وجد-","https://store.tanmiam.org.sa/","https://web.vca.org.sa/"],
+  ]},
+  { title: "الجانب الإداري", rows: [
+    [10,"الاسم الثلاثي لرئيس مجلس الإدارة","هاني بن مقبل القرشي","أحمد بن حربي المطرفي"],
+    [11,"رقم جوال رئيس مجلس الإدارة","0555560712","0555543537"],
+    [12,"الاسم الثلاثي للمدير التنفيذي","مسفر عايض الحارثي","هاني بن مقبل القرشي"],
+    [13,"رقم الجوال للمدير التنفيذي","0555728058","0555560712"],
+  ]},
+  { title: "جانب التخطيط والحوكمة", rows: [
+    [14,"هل تمتلك الجمعية خطة استراتيجية؟ -نرجو إرفاقها-","نعم (مرفق إضافي للسؤال)","نعم (مرفق إضافي للسؤال)"],
+    [15,"هل تمتلك الجمعية خطة تشغيلية/تنفيذية؟ -نرجو إرفاقها-","نعم (مرفق إضافي للسؤال)","نعم (مرفق إضافي للسؤال)"],
+    [16,"كم درجة الحوكمة التي حصلت عليها الجمعية؟ (إن وجد)","99.13","98.27"],
+  ]},
+  { title: "الجانب المالي والتقارير", rows: [
+    [17,"إرفاق التقارير السنوية منذ تأسيس الجمعية -ان وجدت-","تحميل المرفق","تحميل المرفق"],
+    [18,"إرفاق القوائم المالية منذ تأسيس الجمعية -ان وجدت-","تحميل المرفق","تحميل المرفق"],
+    [19,"المنصات الحكومية التي تمتلك فيها الجمعية حسابات فّعالة؟","صندوق دعم الجمعيات","صندوق دعم الجمعيات\nمنصة احسان"],
+    [20,"الجهات المانحة التي تمتلك فيها الجمعية حسابات فّعالة؟",
+      ["أوقاف الضحيان الخيرية","بوابة آل الجميح الخيرية","مؤسسة إبراهيم العنقري الخيرية","مؤسسة الحبيب الخيرية","مؤسسة الحمدان الخير ية","مؤسسة الماجد الأهلية","مؤسسة الملوان الوقفية","مؤسسة الموسى الخير ية","مؤسسة حمد الحصيني وعائلته الخير ية","مؤسسة سامي علي الجفالي الأهلية","مؤسسة عبد هللا الراجحي الخير ية","مؤسسة عبد اللطيف العيسى الخيرية","مؤسسة عبد هللا السبيعي الخير ية","مؤسسة علي بن حسين بن حمران الأهلية","مؤسسة علي بن عبد العزيز الضويان","مؤسسة محمد السبيعي","مؤسسة محمد عبد العز يز الجميح الأهلية","مؤسسة والدة بدر بن صالح الراجحي وأولادها الأهلية","وقف خبرات الاستدامة"],
+      ["أوقاف الضحيان الخيرية","أوقاف نورة الملاحي عبدهللا الراجحي الخيرية","مؤسسة إبراهيم العنقري الخيرية","مؤسسة آل الجميح الخيرية","مؤسسة الجفالي الخيرية","مؤسسة الحبيب الخيرية","مؤسسة الحمدان الخيرية","مؤسسة الراجحي الإنسانية","مؤسسة السبيعي الخير ية (يسر)","مؤسسة العجمي الخيرية","مؤسسة العضيبي الخيرية","مؤسسة الماجد الخيرية","مؤسسة الملوان الخير ية","مؤسسة الناظر الوقفية","مؤسسة حمد الحصيني وعائلته الخير ية","مؤسسة حياة (عبد اللطيف جميل)","مؤسسة سامي علي الجفالي","مؤسسة سليمان ابانمي الأهلية","مؤسسة سليمان بن عبد العزيز الراجحي الخيرية","مؤسسة عبد العزيز الجميح","مؤسسة عبد العزيز الحمدان الخير ية","مؤسسة عبد اللطيف العيسى الخيرية","مؤسسة عبد هللا الثميري الأهلية","مؤسسة عبد هللا الراجحي الخير ية","مؤسسة عبدهللا السبيعي","مؤسسة علي بن حمران الأهلية","مؤسسة علي بن عبدالعزيز الضويان الخير ية","مؤسسة محمد السبيعي (غروس)","مؤسسة محمد بن صالح الشاوي","مؤسسة محمد بن عبد هللا الجميح","مؤسسة والدة بدر بن صالح الراجحي وأولادها الأهلية","مؤسسة وقف أقوم الوقفية","مؤسسة وقف الملوان الوقفية","وقف أحمد عبد العز يز أبانمي","وقف سعد الموسى الخيرية","وقف سعد وعبدالعزيز الموسى"]],
+    [21,"هل تمتلك الجمعية حساب بنكي رسمي نشط؟","نعم","نعم"],
+    [22,"هل تم توثيق الحساب البنكي في منصة نوى؟","نعم","نعم"],
+    [23,"هل تمتلك الجمعية حساب بنكي خاص بالزكاة؟","نعم","نعم"],
+    [24,"هل الجمعية مسجلة في هيئة الزكاة والدخل؟","نعم","نعم"],
+    [25,"هل الجمعية مسجلة كشخص مؤهل للاسترداد الضريبي؟","نعم","نعم"],
+    [26,"إجمالي المنح التي حصلت عليها الجمعية من المنصات الحكومية -مع تحديد المنصة-؟","صندوق دعم الجمعيات (دعم رأس المال البشري)","لم تحدد بعد"],
+    [27,"إجمالي المنح التي حصلت عليها الجمعية من الجهات المانحة -مع تحديد الجهة المانحة-؟","أوقاف الضحيان الخيرية","النادي الصيفي\nبرنامج همم\nبرنامج ملهم"],
+    [28,"المشاريع التي تم رفعها للمنصات الحكومية -مع ذكر اسم المنصة وحالة الطلب-","مواكبون","دعم رأس المال البشري\nمنحة البرامج والمشاريع"],
+    [29,"المشاريع التي تم رفعها للجهات المانحة -مع ذكر اسم المنصة وحالة الطلب-",
+      "-1 مراقي الأسر .\n-2 قيميون\n-3 مبدعون",
+      "مشروع نادي قمم الترفيهي (مؤسسة عبد هللا الراجحي)\nمشروع نادي قمم الترفيهي (مؤسسة الحبيب الخيرية)\nمشروع نادي قمم الترفيهي (مؤسسة عبد اللطيف العيسى)\nمشروع النادي الصيفي بنين وبنات (مؤسسة الجميح الخيرية)\nمشروع العربية لغة وهوية (مؤسسة عبد هللا الثميري)"],
+    [30,"هل تمتلك الجمعية موظف: مُحاِسب؟","نعم","نعم"],
+    [31,"هل تمتلك الجمعية نظام/برنامج محاسبي؟ (اسم النظام أو البرنامج المحاسبي؟)","نعم — محمد سعيد الأحمري","نعم — محمد سعيد الأحمري"],
+  ]},
+  { title: "الجانب التنفيذي", rows: [
+    [32,"هل تم تنفيذ مشاريع منذ نشأة الجمعية؟ (اذكر المشاريع وجهة التنفيذ)",
+      "نعم — مراقي الأسر . برنامج الشراكات مع الجمعيات الخير ية (إصلاحية العاصمة المقدسة)",
+      "نعم — نادي قمم الترفيهي"],
+    [33,'هل لدى الجمعية موظف "مدير مشاريع"؟',"لا","نعم"],
+  ]},
+  { title: "الجانب الإعلامي والتسويقي", rows: [
+    [34,"هل تمتلك الجمعية ملف تعريفي؟","نعم (مرفق إضافي للسؤال)","نعم (مرفق إضافي للسؤال)"],
+    [35,"هل تمتلك الجمعية هوية بصرية؟","نعم (مرفق إضافي للسؤال)","نعم (مرفق إضافي للسؤال)"],
+    [36,"هل تمتلك الجمعية ملفات تسويقية جاهزة؟","نعم (5 مرفقات إضافية)","نعم (6 مرفقات إضافية)"],
+    [37,"ما هي منصات التواصل الاجتماعي النشطة الآن؟",
+      "انستغرام: https://www.instagram.com/ltnmylhly?igsh=MWZyc3MxejFjamN4YQ==\nإيميل: info@tanmiam.org.sa\nإكس: https://x.com/tanmiatalfiha",
+      "إكس: https://x.com/roayah_vca?lang=ar\nانستجرام: https://www.instagram.com/roayah2023/\nيوتيوب: https://www.youtube.com/@roayachild\nتيك توك: https://www.tiktok.com/@roayah2023"],
+    [38,"هل تمتلك الجمعية موظف: مُصّمم (تصاميم)؟","نعم","نعم"],
+  ]},
+];
+
+function linkify(text){
+  const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.replace(/(https?:\/\/[^\s]+)/g, url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+}
+
+function toFlatString(ans){
+  return Array.isArray(ans) ? ans.join(' ، ') : ans;
+}
+
+function isSame(a,b){
+  return toFlatString(a).trim() === toFlatString(b).trim();
+}
+
+function renderAnswer(ans){
+  if(Array.isArray(ans)){
+    return `<div class="name-list">${ans.map(n => `<span class="name-chip">${n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`).join('')}</div>`;
+  }
+  return linkify(ans);
+}
+
+const root = document.getElementById('sectionsRoot');
+let totalSame = 0, totalDiff = 0;
+
+sections.forEach((sec, sIdx) => {
+  const secEl = document.createElement('section');
+  secEl.className = 'q-section';
+  secEl.id = 'sec-' + sIdx;
+  secEl.dataset.section = sIdx;
+
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.innerHTML = `<h2>${sec.title}</h2><span class="count">${sec.rows.length} سؤال</span>`;
+  secEl.appendChild(head);
+
+  sec.rows.forEach(([num, q, a1, a2]) => {
+    const same = isSame(a1, a2);
+    if(same) totalSame++; else totalDiff++;
+
+    const row = document.createElement('div');
+    row.className = 'q-row' + (same ? '' : ' is-diff');
+    row.dataset.search = (q + ' ' + toFlatString(a1) + ' ' + toFlatString(a2)).toLowerCase();
+
+    row.innerHTML = `
+      <div class="q-num">${num}</div>
+      <div class="q-text">${q}</div>
+      <div class="q-ans"><span class="org-tag">${COL1}</span>${renderAnswer(a1)}</div>
+      <div class="q-ans"><span class="org-tag">${COL2}</span>${renderAnswer(a2)}</div>
+      <div class="flag-cell">${same ? '<span class="same-flag">إجابة متطابقة</span>' : '<span class="diff-flag">إجابة مختلفة</span>'}</div>
+    `;
+    secEl.appendChild(row);
+  });
+
+  root.appendChild(secEl);
+});
+
+document.getElementById('sameCount') && (document.getElementById('sameCount').textContent = totalSame);
+document.getElementById('diffCount') && (document.getElementById('diffCount').textContent = totalDiff);
+</script>
+
+</body>
+</html>
